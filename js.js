@@ -1,108 +1,61 @@
 const taskManager = document.getElementById('tasks');
 const header = document.getElementById('header');
-const ul = document.getElementsByTagName('ul')[0];
+const ul = document.getElementById('tasks');
+addBtn = document.getElementById('add');
 
-let AddBtn = function () {
-    this.addBtn = document.createElement('img');
-    this.addBtn.src = 'assets/add.png';
-    this.addBtn.setAttribute('id', 'add');
+const input = document.querySelector('input');
 
-    header.appendChild(this.addBtn);
-};
-
-AddBtn.prototype.newTask = function () {
-    this.addBtn.addEventListener('click', AddTask);
-
-    this.addBtn.onmouseover = () => {
-        this.addBtn.style.cursor = 'pointer';
-        this.addBtn.classList.add('img-over');
-    }
-    this.addBtn.onmouseout = () => {
-        this.addBtn.classList.remove('img-over');
-    }
+function createTask(text) {
+    let li = document.createElement('li');
+    li.classList.add('task');
+    li.innerHTML = text;
+    return li;
 }
 
-let Task = function () {
-    this.li = document.createElement('li');
-    this.li.innerHTML = input.value;
-
-    this.deleteBtn = this.deleteBtn = document.createElement('img');
-    this.deleteBtn.src = 'assets/delete.png'
-
-    this.li.insertAdjacentElement('afterbegin', this.deleteBtn)
-    taskManager.appendChild(this.li)
-};
-
-Task.prototype.remove = function () {
-    this.deleteBtn.addEventListener('click', () => {
-        this.li.parentNode.removeChild(this.li);
-    });
+function renderTask(text) {
+    let li = createTask(text);
+    taskManager.appendChild(li);
 }
-
-Task.prototype.buttonChange = function () {
-    this.deleteBtn.onmouseover, () => {
-        this.deleteBtn.style.cursor = 'pointer';
-    };
-
-    this.deleteBtn.onmouseover = () => {
-        this.deleteBtn.classList.add('deleteBtn');
-    };
-    this.deleteBtn.onmouseout = () => this.deleteBtn.classList.remove('deleteBtn');
-}
-
-Task.prototype.taskComplete = function () {
-    this.li.addEventListener('click', () => {
-        this.li.classList.toggle('taskComplete');
-    })
-}
-
-// let newTask = function (event) {
-//     if (event.keyCode === 13) {
-//         AddTask();
-//     }
-// }
 
 let AddTask = function () {
     if (input.value === '') {
         return;
     }
-    let task = new Task();
-
-    task.taskComplete();
-
-    task.remove();
-
-    task.buttonChange();
-
+    renderTask(input.value);
     input.value = '';
 };
 
-const addBtn = new AddBtn();
+taskManager.onclick = (event) => {
+    if (event.target.tagName == 'UL') {
+        return;
+    }
+    event.target.classList.toggle('taskComplete');
+}
 
-const input = document.querySelector('input');
-input.addEventListener('click', addBtn.newTask());
+addBtn.addEventListener('click', AddTask);
 
-//тут я пытаюсь с помощью кнопки clear удалить все выполненные(зачеркнутые) элементы. спойлер! не работает
 const clear = document.getElementById('clear-button');
 clear.addEventListener('click', () => {
-    let deleteList = document.querySelectorAll('taskComplete');
-    
-    deleteList.forEach((elem) => {
-        elem.parentNode.removeChild(elem);
+    let deleteList = document.querySelectorAll('.taskComplete');
+
+    deleteList.forEach((element) => {
+        element.parentNode.removeChild(element);
     })
 })
 
-//тут я нашел, как можно сохранять все в localstorage, но пока еще не совсем понял, как это работает.
 const save = document.getElementById('save-button');
-save.addEventListener('click', ()=>{
-    localStorage.setItem('todo-list', ul.innerHTML);
+
+save.addEventListener('click', () => {
+    const data = Array.from(document.getElementById('tasks').children).map(element => element.innerHTML);
+    console.log(data);
+
+    localStorage.setItem('todo-list', data);
 })
 
-// function loadTodos() {
-//     const data = localStorage.getItem("todo-list");
-//     if (data) {
-//         ul.innerHTML = data;
-//     }
-// }
+function loadTodos() {
+   const data = localStorage.getItem('todo-list').split(',');
 
-//     loadTodos();
+   data.forEach(text => renderTask(text));
+}
+
+    loadTodos();
